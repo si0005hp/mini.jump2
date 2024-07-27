@@ -59,6 +59,7 @@
 ---   previous/current line. Note that with backward jump this might lead to
 ---   cursor being on target if can't be put past the line.
 ---@alias __jump_n_times number|nil Number of times to perform consecutive jumps.
+---@alias __target_n_chars number|nil Number of characters for search target.
 
 -- Module definition ==========================================================
 local MiniJump = {}
@@ -218,8 +219,10 @@ end
 ---
 ---@param backward __jump_backward
 ---@param till __jump_till
-MiniJump.smart_jump = function(backward, till)
+---@param n __target_n_chars
+MiniJump.smart_jump = function(backward, till, n)
   if H.is_disabled() then return end
+  n = n or 1
 
   -- Jumping should stop after mode change (use `mode(1)` to track 'omap' case)
   -- or if cursor has moved after latest jump
@@ -230,7 +233,7 @@ MiniJump.smart_jump = function(backward, till)
   -- Ask for target only when needed
   local target
   if not MiniJump.state.jumping or MiniJump.state.target == nil then
-    target = H.get_target()
+    target = H.get_target(n)
     -- Stop if user supplied invalid target
     if target == nil then return end
   end
@@ -356,14 +359,15 @@ H.get_config = function(config)
 end
 
 -- Mappings -------------------------------------------------------------------
-H.make_expr_jump = function(backward, till)
+H.make_expr_jump = function(backward, till, n)
   return function()
     if H.is_disabled() then return '' end
+    n = n or 1
 
     -- Ask for `target` for non-repeating jump as this will be used only in
     -- operator-pending mode. Dot-repeat is supported via expression-mapping.
     local is_repeat_jump = backward == nil or till == nil
-    local target = is_repeat_jump and MiniJump.state.target or H.get_target()
+    local target = is_repeat_jump and MiniJump.state.target or H.get_target(n)
 
     -- Stop if user supplied invalid target
     if target == nil then return '<Esc>' end
@@ -516,20 +520,30 @@ end
 
 H.get_cursor_data = function() return { vim.api.nvim_get_current_win(), vim.api.nvim_win_get_cursor(0) } end
 
-H.get_target = function()
+H.get_target = function(n)
+  n = n or 1
+
   local needs_help_msg = true
   vim.defer_fn(function()
     if not needs_help_msg then return end
     H.echo('Enter target single character ')
     H.cache.msg_shown = true
   end, 1000)
-  local ok, char = pcall(vim.fn.getcharstr)
+
+  local chars = {}
+  for _ = 1, n do
+    local ok, char = pcall(vim.fn.getcharstr)
+    if not ok or char == '\27' then
+      needs_help_msg = false
+      H.unecho()
+      return
+    end
+    table.insert(chars, char)
+  end
   needs_help_msg = false
   H.unecho()
 
-  -- Terminate if couldn't get input (like with <C-c>) or it is `<Esc>`
-  if not ok or char == '\27' then return end
-  return char
+  return table.concat(chars)
 end
 
 H.map = function(mode, lhs, rhs, opts)
