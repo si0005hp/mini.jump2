@@ -100,6 +100,8 @@ MiniJump.config = {
   mappings = {
     forward = 'f',
     backward = 'F',
+    forward2 = 's',
+    backward2 = 'S',
     forward_till = 't',
     backward_till = 'T',
     repeat_jump = ';',
@@ -307,6 +309,8 @@ H.setup_config = function(config)
 
     ['mappings.forward'] = { config.mappings.forward, 'string' },
     ['mappings.backward'] = { config.mappings.backward, 'string' },
+    ['mappings.forward2'] = { config.mappings.forward2, 'string' },
+    ['mappings.backward2'] = { config.mappings.backward2, 'string' },
     ['mappings.forward_till'] = { config.mappings.forward_till, 'string' },
     ['mappings.backward_till'] = { config.mappings.backward_till, 'string' },
     ['mappings.repeat_jump'] = { config.mappings.repeat_jump, 'string' },
@@ -321,18 +325,24 @@ H.apply_config = function(config)
   --stylua: ignore start
   H.map('n', config.mappings.forward, '<Cmd>lua MiniJump.smart_jump(false, false)<CR>', { desc = 'Jump forward' })
   H.map('n', config.mappings.backward, '<Cmd>lua MiniJump.smart_jump(true, false)<CR>', { desc = 'Jump backward' })
+  H.map('n', config.mappings.forward2, '<Cmd>lua MiniJump.smart_jump(false, false, 2)<CR>', { desc = 'Jump forward 2 chars' })
+  H.map('n', config.mappings.backward2, '<Cmd>lua MiniJump.smart_jump(true, false, 2)<CR>', { desc = 'Jump backward 2 chars' })
   H.map('n', config.mappings.forward_till, '<Cmd>lua MiniJump.smart_jump(false, true)<CR>', { desc = 'Jump forward till' })
   H.map('n', config.mappings.backward_till, '<Cmd>lua MiniJump.smart_jump(true, true)<CR>', { desc = 'Jump backward till' })
   H.map('n', config.mappings.repeat_jump, '<Cmd>lua MiniJump.jump()<CR>', { desc = 'Repeat jump' })
 
   H.map('x', config.mappings.forward, '<Cmd>lua MiniJump.smart_jump(false, false)<CR>', { desc = 'Jump forward' })
   H.map('x', config.mappings.backward, '<Cmd>lua MiniJump.smart_jump(true, false)<CR>', { desc = 'Jump backward' })
+  H.map('x', config.mappings.forward2, '<Cmd>lua MiniJump.smart_jump(false, false, 2)<CR>', { desc = 'Jump forward 2 chars' })
+  H.map('x', config.mappings.backward2, '<Cmd>lua MiniJump.smart_jump(true, false, 2)<CR>', { desc = 'Jump backward 2 chars' })
   H.map('x', config.mappings.forward_till, '<Cmd>lua MiniJump.smart_jump(false, true)<CR>', { desc = 'Jump forward till' })
   H.map('x', config.mappings.backward_till, '<Cmd>lua MiniJump.smart_jump(true, true)<CR>', { desc = 'Jump backward till' })
   H.map('x', config.mappings.repeat_jump, '<Cmd>lua MiniJump.jump()<CR>', { desc = 'Repeat jump' })
 
   H.map('o', config.mappings.forward, H.make_expr_jump(false, false), { expr = true, desc = 'Jump forward' })
   H.map('o', config.mappings.backward, H.make_expr_jump(true, false), { expr = true, desc = 'Jump backward' })
+  H.map('o', config.mappings.forward2, H.make_expr_jump(false, false, 2), { expr = true, desc = 'Jump forward 2 chars' })
+  H.map('o', config.mappings.backward2, H.make_expr_jump(true, false, 2), { expr = true, desc = 'Jump backward 2 chars' })
   H.map('o', config.mappings.forward_till, H.make_expr_jump(false, true), { expr = true, desc = 'Jump forward till' })
   H.map('o', config.mappings.backward_till, H.make_expr_jump(true, true), { expr = true, desc = 'Jump backward till' })
   H.map('o', config.mappings.repeat_jump, H.make_expr_jump(), { expr = true, desc = 'Repeat jump' })
